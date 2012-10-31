@@ -30,6 +30,7 @@ DEBUG = (env.get('DEBUG', 'False') in ('True', 'true'))
 COMPRESS_ENABLED = True
 TEMPLATE_DEBUG = DEBUG
 STATIC_ROOT = '/home/dotcloud/static/'
+GOOGLE_ANALYTICS_ACCOUNT = env.get('GOOGLE_ANALYTICS_ACCOUNT', '')
 
 ###############################################################################
 #
