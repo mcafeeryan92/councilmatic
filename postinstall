@@ -54,7 +54,7 @@ LEGISLATION = {
 HAYSTACK_CONNECTIONS = {
     'default': {
         'ENGINE': 'haystack.backends.whoosh_backend.WhooshEngine',
-        'PATH': '/home/dotcloud/whoosh_index',
+        'PATH': '/home/dotcloud/data/whoosh_index',
     }
 }
 
@@ -148,11 +148,11 @@ python manage.py migrate --noinput
 python manage.py collectstatic --noinput
 
 echo 'Getting ready for the search index'
-mkdir ~/whoosh_index
+mkdir -p ~/data/whoosh_index
 #python manage.py rebuild_index --noinput & disown  # run this in the bg
 
 echo 'Getting ready for logs'
-mkdir ~/logs
+mkdir -p ~/logs
 
 echo 'Scheduling the cron jobs'
 cd ../
