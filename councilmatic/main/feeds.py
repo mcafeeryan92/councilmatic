@@ -17,7 +17,7 @@ library = ContentFeedLibrary()
 
 class NewLegislationFeed (ContentFeed):
     def get_content(self):
-        return LegFile.objects.all().order_by('-intro_date')
+        return LegFile.objects.all().exclude(title='').order_by('-intro_date')
 
     def get_updates_since(self, datetime):
         return self.get_content().filter(intro_date__gt=datetime)
@@ -40,7 +40,7 @@ class NewLegislationFeed (ContentFeed):
 
 
 class LegislationUpdatesFeed (ContentFeed):
-    manager = LegFile.objects
+    manager = LegFile.objects.exclude(title='')
 
     def __init__(self, **selectors):
         self.selectors = selectors
@@ -157,7 +157,10 @@ class SearchResultsFeed (ContentFeed):
         else:
             self.filter = {}
 
-    def get_content(self):
+    def get_complete_content(self):
+        """
+        Get all content regardless of whether the title is empty.
+        """
         qs = SearchQuerySet()
         for key, val in self.filter.iteritems():
             if isinstance(val, list):
@@ -168,6 +171,18 @@ class SearchResultsFeed (ContentFeed):
 
         return qs.order_by('order_date')
 
+    def yield_nonempty_titles(self, sqs):
+        for item in sqs:
+            if item.object.title:
+                yield item
+    
+    def get_content(self):
+        """
+        Return only content that refers to objects with a non-empty title.
+        """
+        all_content = self.get_complete_content()
+        return self.yield_nonempty_titles(all_content)
+
     def get_changes_to(self, item, datetime):
         if item.model_name == 'legfile':
             return {'Title': item.object.title}, item.order_date
@@ -175,11 +190,16 @@ class SearchResultsFeed (ContentFeed):
             return {'Minutes': str(item.object)}, item.order_date
 
     def get_last_updated_time(self):
-        content = self.get_content()
-        return (list(content))[-1].order_date
+        content = list(self.get_content())
+        if content:
+            return (list(content))[-1].order_date
+        else:
+            return datetime.min
 
     def get_updates_since(self, datetime):
-        new_content = self.get_content().filter(order_date__gt=datetime).order_by('order_date')
+        new_content = self.yield_nonempty_titles(
+            self.get_complete_content()\
+                .filter(order_date__gt=datetime).order_by('order_date'))
         return new_content
 
     def get_params(self):
