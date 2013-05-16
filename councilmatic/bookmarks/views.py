@@ -9,8 +9,7 @@ from utils.decorators import LoginRequired
 
 
 class BaseBookmarkMixin (object):
-    def get_bookmark_data(self, content):
-        user = self.request.user
+    def get_bookmark_data(self, content, user, bookmarks=None):
         contenttype = contenttypes.models.ContentType.objects.get_for_model(content)
 
         if not user.is_authenticated():
@@ -19,12 +18,15 @@ class BaseBookmarkMixin (object):
             bookmark_form = None
         else:
             try:
-                bookmark = user.bookmarks.get(content_id=content.pk,
-                                              content_type=contenttype.pk)
+                if bookmarks is not None:
+                    bookmark = bookmarks[content.pk, contenttype.pk]
+                else:
+                    bookmark = user.bookmarks.get(content_id=content.pk,
+                                                  content_type=contenttype.pk)
                 is_bookmarked = True
                 bookmark_form = None
 
-            except models.Bookmark.DoesNotExist:
+            except (KeyError, models.Bookmark.DoesNotExist):
                 bookmark = None
                 is_bookmarked = False
                 bookmark_form = forms.BookmarkForm({'user': user.pk,
@@ -34,7 +36,14 @@ class BaseBookmarkMixin (object):
         return bookmark, contenttype, bookmark_form
 
     def get_bookmarks_data(self, content_list):
-        data = [(content,) + self.get_bookmark_data(content)
+        user = self.request.user
+
+        bookmarks = {}
+        if user.is_authenticated():
+            for bookmark in user.bookmarks.all().select_related('content_type'):
+                bookmarks[bookmark.content_id, bookmark.content_type.pk] = bookmark
+
+        data = [(content,) + self.get_bookmark_data(content, user, bookmarks)
                 for content in content_list]
         return data
 
@@ -89,8 +98,8 @@ class CreateBookmarkView (views.CreateView):
     http_method_names = ['post']
 
     def form_invalid(self, form):
-        messages.add_message(request, messages.ERROR, 'Could not bookmark content')
-        messages.add_message(request, messages.DEBUG, form.errors)
+        messages.add_message(self.request, messages.ERROR, 'Could not bookmark content')
+        messages.add_message(self.request, messages.DEBUG, form.errors)
         return HttpResponseRedirect(self.request.POST['next'])
 
     def get_success_url(self):

@@ -67,7 +67,7 @@ class BaseDashboardMixin (SearchBarMixin,
                           bookmarks.views.BaseBookmarkMixin):
 
     def get_recent_legislation(self):
-        legfiles = self.get_filtered_legfiles()
+        legfiles = self.get_filtered_legfiles().prefetch_related('metadata__topics')
         return list(legfiles.exclude(metadata__topics__topic='Routine').order_by('-key')[:3])
 
     def get_context_data(self, **kwargs):
@@ -143,7 +143,9 @@ class SearcherMixin (object):
 
     def _get_search_results(self, query_params):
         if len(query_params) == 0:
-            search_queryset = phillyleg.models.LegFile.objects.all().order_by('-key')
+            search_queryset = phillyleg.models.LegFile.objects.all()\
+                .order_by('-key')\
+                .prefetch_related('metadata__locations', 'metadata__topics')
 
         else:
             class SQSProxy (object):
@@ -159,9 +161,24 @@ class SearcherMixin (object):
                     return (result.object for result in self.sqs)
                 def __getitem__(self, key):
                     if isinstance(key, slice):
-                        return [result.object for result in self.sqs[key] if result is not None]
+                        objs = [result.object for result in self.sqs[key] if result is not None]
+
+                        # Manually prefetch related metadata
+                        metadata = dict([
+                            (metadata.legfile_id, metadata)
+                             for metadata in phillyleg.models.LegFileMetaData.objects
+                                .filter(legfile__in=objs)
+                                .prefetch_related('locations', 'topics')])
+                        for obj in objs:
+                            obj.metadata = metadata[obj.key]
+
+                        return objs
                     else:
-                        return self.sqs[key].object
+                        obj = self.sqs[key].object
+                        obj.metadata = phillyleg.models.LegFileMetaData.objects\
+                            .prefetch_related('locations', 'topics')\
+                            .get(legfile=obj)
+                        return obj
 
             search_queryset = SQSProxy(self.search_view.results)
         return search_queryset
@@ -187,6 +204,7 @@ class LegFileListFeedView (SearcherMixin, DjangoFeed):
 class SearchView (SearcherMixin,
                   SearchBarMixin,
                   subscriptions.views.SingleSubscriptionMixin,
+                  bookmarks.views.BaseBookmarkMixin,
                   views.ListView):
     template_name = 'councilmatic/search.html'
     paginate_by = 20
@@ -207,18 +225,8 @@ class SearchView (SearcherMixin,
         search_queryset = self._get_search_results(query_params)
         return search_queryset
 
-    def get_context_data(self, **kwargs):
-        """
-        Generates the actual HttpResponse to send back to the user.
-        """
-        context = super(SearchView, self).get_context_data(**kwargs)
-        context['form'] = self.search_view.form
-
-        page_obj = context.get('page_obj', None)
-        query_params = self.request.GET.copy()
-        if 'page' in query_params:
-            del query_params['page']
-
+    def get_pages_context_data(self, page_obj, query_params):
+        context = {}
         if page_obj:
             context['first_url'] = self.paginated_url(
                 1, query_params)
@@ -246,6 +254,27 @@ class SearchView (SearcherMixin,
                     url = None
                 page_urls.append((page_num, url))
             context['page_urls'] = page_urls
+        return context
+
+    def get_context_data(self, **kwargs):
+        """
+        Generates the actual HttpResponse to send back to the user.
+        """
+        context = super(SearchView, self).get_context_data(**kwargs)
+        context['form'] = self.search_view.form
+
+        page_obj = context.get('page_obj', None)
+        query_params = self.request.GET.copy()
+        if 'page' in query_params:
+            del query_params['page']
+
+        context.update(self.get_pages_context_data(page_obj, query_params))
+
+        bookmark_data = self.get_bookmarks_data(self.object_list)
+        bookmark_cache_key = self.get_bookmarks_cache_key(bookmark_data)
+
+        context['bookmark_data'] = bookmark_data
+        context['bookmark_cache_key'] = bookmark_cache_key
 
         log.debug(context)
         return context

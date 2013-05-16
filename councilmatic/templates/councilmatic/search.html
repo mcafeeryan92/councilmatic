@@ -18,11 +18,7 @@
             <h3>{% trans "Legislation results" %}</h3>
 	    <div class='clearfix'></div>
 	    <hr />
-            {% for file in object_list %}
-              <article class="clearfix">
-                {% include "councilmatic/partials/legfile_list_item.html" %}
-              </article>
-            {% endfor %}
+        {% include "councilmatic/partials/legfile_list.html" %}
 
             {% if page_obj.has_previous or page_obj.has_next %}
             <div class="pagination pagination-centered">
