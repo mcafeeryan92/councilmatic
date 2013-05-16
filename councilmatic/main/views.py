@@ -4,6 +4,8 @@ from django.contrib.syndication.views import Feed as DjangoFeed
 from django.shortcuts import get_object_or_404
 from django.views import generic as views
 from haystack.query import SearchQuerySet
+import datetime
+from datetime import timedelta
 
 from cm_api.resources import SubscriberResource
 from main import feeds
@@ -68,7 +70,7 @@ class BaseDashboardMixin (SearchBarMixin,
 
     def get_recent_legislation(self):
         legfiles = self.get_filtered_legfiles().prefetch_related('metadata__topics')
-        return list(legfiles.exclude(metadata__topics__topic='Routine').order_by('-key')[:3])
+        return list(legfiles.exclude(metadata__topics__topic='Routine').order_by('-key')[:6])
 
     def get_context_data(self, **kwargs):
         search_form = forms.FullSearchForm()
@@ -101,10 +103,60 @@ class AppDashboardView (BaseDashboardMixin,
                        all().filter(valid=True).order_by('-pk')[:10].\
                        prefetch_related('references_in_legislation'))
 
+    def get_recent_topics(self):
+        # get the month weeks of legislation
+        now = datetime.date.today()
+        one_month = datetime.timedelta(days=31)
+        date_string = now-one_month
+
+        topic_count_query = """SELECT phillyleg_metadata_topic.id, phillyleg_metadata_topic.topic, Count(phillyleg_legfilemetadata.legfile_id) AS leg_count FROM phillyleg_metadata_topic
+        JOIN phillyleg_legfilemetadata_topics ON phillyleg_legfilemetadata_topics.metadata_topic_id = phillyleg_metadata_topic.id
+        JOIN phillyleg_legfilemetadata ON phillyleg_legfilemetadata.id = phillyleg_legfilemetadata_topics.legfilemetadata_id
+        JOIN phillyleg_legfile ON phillyleg_legfile.key = phillyleg_legfilemetadata.legfile_id
+        WHERE phillyleg_legfile.intro_date > '{date_string}' AND phillyleg_metadata_topic.topic != 'Routine'
+        GROUP BY phillyleg_metadata_topic.topic, phillyleg_metadata_topic.id
+        ORDER BY leg_count DESC""".format(date_string=date_string)
+
+        return list(phillyleg.models.MetaData_Topic.objects.raw(topic_count_query))
+
+
     def get_context_data(self, **kwargs):
-        locations = self.get_recent_locations()
+
+        recent_topics_query = self.get_recent_topics()
+        recent_topics = []
+
+        for t in recent_topics_query:
+            percent_width = 100 * (float(t.leg_count) / float(recent_topics_query[0].leg_count))
+            recent_topics.append({'topic': t.topic, 'leg_count': t.leg_count, 'percent_width': percent_width})
+
         context_data = super(AppDashboardView, self).get_context_data(**kwargs)
-        context_data['locations'] = locations
+        context_data['recent_topics'] = recent_topics
+        return context_data
+
+class CouncilMembersView(views.TemplateView):
+    template_name = 'councilmatic/councilmembers.html'
+
+    def get_councilmembers(self):
+        return phillyleg.models.CouncilMember.objects.\
+               filter(title__icontains='alderman').\
+               exclude(title__icontains='former').order_by('name')
+
+    def get_former_councilmembers(self):
+        return phillyleg.models.CouncilMember.objects.\
+               filter(title__icontains='former').\
+               order_by('name')
+
+    def get_other_councilmembers(self):
+        return phillyleg.models.CouncilMember.objects.\
+               exclude(title__icontains='former').exclude(title__icontains='alderman').\
+               order_by('name')
+
+
+    def get_context_data(self, **kwargs):
+        context_data = super(CouncilMembersView, self).get_context_data(**kwargs)
+        context_data['councilmembers'] = self.get_councilmembers()
+        context_data['former_councilmembers'] = self.get_former_councilmembers()
+        context_data['other_councilmembers'] = self.get_other_councilmembers()
         return context_data
 
 
@@ -123,10 +175,23 @@ class CouncilMemberDetailView (BaseDashboardMixin,
     def get_district(self):
         return self.object.district
 
+    def get_topics(self):
+        topic_count_query = """SELECT phillyleg_metadata_topic.id, phillyleg_metadata_topic.topic, Count(phillyleg_legfilemetadata.legfile_id) AS leg_count FROM phillyleg_metadata_topic
+        JOIN phillyleg_legfilemetadata_topics ON phillyleg_legfilemetadata_topics.metadata_topic_id = phillyleg_metadata_topic.id
+        JOIN phillyleg_legfilemetadata ON phillyleg_legfilemetadata.id = phillyleg_legfilemetadata_topics.legfilemetadata_id
+        JOIN phillyleg_legfile ON phillyleg_legfile.key = phillyleg_legfilemetadata.legfile_id
+        JOIN phillyleg_legfile_sponsors ON phillyleg_legfile_sponsors.legfile_id = phillyleg_legfile.key
+        WHERE phillyleg_metadata_topic.topic != 'Routine' AND phillyleg_legfile_sponsors.councilmember_id = {sponsor_id}
+        GROUP BY phillyleg_metadata_topic.topic, phillyleg_metadata_topic.id
+        ORDER BY leg_count DESC""".format(sponsor_id=self.object.id)
+
+        return phillyleg.models.MetaData_Topic.objects.raw(topic_count_query)
+
     def get_context_data(self, **kwargs):
         district = self.get_district()
         context_data = super(CouncilMemberDetailView, self).get_context_data(**kwargs)
         context_data['district'] = district
+        context_data['recent_topics'] = self.get_topics()
         return context_data
 
 
@@ -134,12 +199,12 @@ class SearcherMixin (object):
     def _init_haystack_searchview(self, request):
         # Construct and run a haystack SearchView so that we can use the
         # resulting values.
-        self.search_view = haystack.views.SearchView(form_class=forms.FullSearchForm, searchqueryset=SearchQuerySet().order_by('-order_date'))
+        self.search_view = haystack.views.SearchView(form_class=forms.FullSearchForm, searchqueryset=SearchQuerySet())
         self.search_view.request = request
 
         self.search_view.form = self.search_view.build_form()
         self.search_view.query = self.search_view.get_query()
-        self.search_view.results = self.search_view.get_results()
+        self.search_view.results = self.search_view.get_results().order_by('-order_date')
 
     def _get_search_results(self, query_params):
         if len(query_params) == 0:
