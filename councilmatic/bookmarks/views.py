@@ -61,7 +61,7 @@ class SingleBookmarkedObjectMixin (BaseBookmarkMixin):
     def get_context_data(self, **kwargs):
         context = super(SingleBookmarkedObjectMixin, self).get_context_data(**kwargs)
 
-        bookmark, contenttype, bookmark_form = self.get_bookmark_data(self.object)
+        bookmark, contenttype, bookmark_form = self.get_bookmark_data(self.object, self.request.user)
 
         context['bookmark'] = bookmark
         context['is_bookmarked'] = bookmark is not None
