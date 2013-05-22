@@ -7,8 +7,8 @@ Contact Us
 - Join the mailing list at https://groups.google.com/group/councilmatic/
 - Find us on irc.freenode.net in the #councilmatic room
 
-Getting Started
----------------
+Installation
+------------
 First check out the project code.
 
     $ git clone git://github.com/codeforamerica/councilmatic.git
