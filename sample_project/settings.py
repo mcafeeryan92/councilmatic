@@ -1,10 +1,17 @@
 import os
+import sys
 
 # Make filepaths relative to settings.
 def rel_path(*subs):
     """Make filepaths relative to this settings file"""
     root_path = os.path.dirname(os.path.abspath(__file__))
     return os.path.join(root_path, *subs)
+
+
+# Put all the councilmatic apps on the Python path
+import councilmatic
+COUNCILMATIC_ROOT = os.path.abspath(councilmatic.__path__[0])
+sys.path.append(COUNCILMATIC_ROOT)
 
 
 # Django settings for councilmatic project.
@@ -183,18 +190,16 @@ COMMUNITY_APPS = (
     'uni_form',
     'django_nose',
     'social_auth',
-    'ebdata', # From everyblock -- used here for parsing addresses and such
+    'councilmatic.ebdata', # From everyblock -- used here for parsing addresses and such
     'compressor',
     'djangorestframework',
     'debug_toolbar',
+    'model_blocks',
+    'mustachejs',
 )
 
-MY_REUSABLE_APPS = (
-   'model_blocks',
-   'mustachejs',
-)
-
-PROJECT_APPS = (
+COUNCILMATIC_APPS = (
+    'councilmatic',
     'cm',
     'cm_api',
     'phillyleg',
@@ -204,6 +209,10 @@ PROJECT_APPS = (
     'opinions',
     'main',
     'utils',
+)
+
+PROJECT_SPECIFIC_APPS = (
+    'sample',
 )
 
 INSTALLED_APPS = (
@@ -216,7 +225,7 @@ INSTALLED_APPS = (
     'django.contrib.staticfiles',
     'django.contrib.comments',
     'django.contrib.gis',
-) + COMMUNITY_APPS + MY_REUSABLE_APPS + PROJECT_APPS
+) + COMMUNITY_APPS + COUNCILMATIC_APPS + PROJECT_SPECIFIC_APPS
 
 ################################################################################
 #

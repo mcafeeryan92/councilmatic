@@ -1,7 +1,11 @@
 #!/usr/bin/env python
 import os, sys
 
-sys.path.append(os.path.dirname(__file__))
+ROOT = os.path.join(os.path.dirname(__file__), os.path.pardir)
+sys.path.append(ROOT)
+
+PROJECT_ROOT = os.path.dirname(__file__)
+sys.path.append(PROJECT_ROOT)
 
 if __name__ == "__main__":
     os.environ.setdefault("DJANGO_SETTINGS_MODULE", "settings")
