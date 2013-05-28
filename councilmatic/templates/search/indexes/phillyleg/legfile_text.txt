@@ -1,5 +1,0 @@
-{{ object.title }}
-{{ object.id }}
-{% for attachment in object.attachments.all %}
-  {{ attachment.fulltext }}
-{% endfor %}
