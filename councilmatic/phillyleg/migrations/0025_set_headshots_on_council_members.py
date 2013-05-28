@@ -8,78 +8,16 @@ class Migration(DataMigration):
 
     def forwards(self, orm):
         "Write your forwards methods here."
-        green = orm.CouncilMember.objects.get_or_create(name='Councilmember Green')[0]
-        green.headshot = 'phillyleg/billGreenSM.jpg'
-        green.save()
-        
-        oniell = orm.CouncilMember.objects.get_or_create(name='Councilmember O\'Neill')[0]
-        oniell.headshot = 'phillyleg/Councilman_ONeillsmall.gif'
-        oniell.save()
-        
-        kelly = orm.CouncilMember.objects.get_or_create(name='Councilmember Kelly')[0]
-        kelly.headshot = 'phillyleg/jackKellySM.jpg'
-        kelly.save()
-        
-        tasco = orm.CouncilMember.objects.get_or_create(name='Councilmember Tasco')[0]
-        tasco.headshot = 'phillyleg/TascoSM.jpg'
-        tasco.save()
-        
-        rb = orm.CouncilMember.objects.get_or_create(name='Councilmember Reynolds Brown')[0]
-        rb.headshot = 'phillyleg/BRBphoto_SM.jpg'
-        rb.save()
-        
-        dicicco = orm.CouncilMember.objects.get_or_create(name='Councilmember DiCicco')[0]
-        dicicco.headshot = 'phillyleg/DiCiccoSM.jpg'
-        dicicco.save()
-        
-        blackwell = orm.CouncilMember.objects.get_or_create(name='Councilmember Blackwell')[0]
-        blackwell.headshot = 'phillyleg/JBlackwellSM.jpg'
-        blackwell.save()
-        
-        verna = orm.CouncilMember.objects.get_or_create(name='Council President Verna')[0]
-        verna.headshot = 'phillyleg/VernaSM.jpg'
-        verna.save()
-        
-        jones = orm.CouncilMember.objects.get_or_create(name='Councilmember Jones')[0]
-        jones.headshot = 'phillyleg/cJonesSM.jpg'
-        jones.save()
-        
-        miller = orm.CouncilMember.objects.get_or_create(name='Councilmember Miller')[0]
-        miller.headshot = 'phillyleg/drmSM.jpg'
-        miller.save()
-        
-        kenny = orm.CouncilMember.objects.get_or_create(name='Councilmember Kenney')[0]
-        kenny.headshot = 'phillyleg/JimKennySM.jpg'
-        kenny.save()
-        
-        quinones = orm.CouncilMember.objects.get_or_create(name='Councilmember Sanchez')[0]
-        quinones.headshot = 'phillyleg/MDQSSM.jpg'
-        quinones.save()
-        
-        clarke = orm.CouncilMember.objects.get_or_create(name='Councilmember Clarke')[0]
-        clarke.headshot = 'phillyleg/ClarkeSM.jpg'
-        clarke.save()
-        
-        goode = orm.CouncilMember.objects.get_or_create(name='Councilmember Goode')[0]
-        goode.headshot = 'phillyleg/GoodeSM.jpg'
-        goode.save()
-        
-        krajewski = orm.CouncilMember.objects.get_or_create(name='Councilmember Krajewski')[0]
-        krajewski.headshot = 'phillyleg/KrajewskiSM.jpg'
-        krajewski.save()
-        
-        rizzo = orm.CouncilMember.objects.get_or_create(name='Councilmember Rizzo')[0]
-        rizzo.headshot = 'phillyleg/RizzoSM.jpg'
-        rizzo.save()
-        
-        greenlee = orm.CouncilMember.objects.get_or_create(name='Councilmember Greenlee')[0]
-        greenlee.headshot = 'phillyleg/williamGreenleeSM.jpg'
-        greenlee.save()
-
+        # This migration is not the place to set member headshots. This should
+        # be done either through the admin interface, or through a fixture.
+        #
+        # This migration file remains (though empty) to not cause problems on
+        # installations that have already run it.
+        pass
 
     def backwards(self, orm):
         "Write your backwards methods here."
-
+        pass
 
     models = {
         'auth.group': {
