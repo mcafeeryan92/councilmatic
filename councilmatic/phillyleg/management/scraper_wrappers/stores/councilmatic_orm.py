@@ -116,9 +116,21 @@ class CouncilmaticDataStoreWrapper (object):
         for action_record in action_records:
             action_record = self.__replace_key_with_legfile(action_record)
             action_record = self.__replace_url_with_minutes(action_record)
+            votes = action_record.pop('votes', [])
+            action = None
             if not self.is_duplicate_action(action_record):
-                self._save_or_ignore(LegAction, action_record)
+                action = self._save_or_ignore(LegAction, action_record)
 
+            if action is None:
+                continue
+
+            for vote_record in votes:
+                vote_record['action'] = action
+                voter_name = vote_record['voter']
+                voter, created = CouncilMember.objects.get_or_create(name=voter_name)
+                vote_record['voter'] = voter
+                vote = self._save_or_ignore(LegVote, vote_record)
+                
     def is_duplicate_action(self, action_record):
         """
         Check whether the given action_record data already exists in the
@@ -206,8 +218,8 @@ class CouncilmaticDataStoreWrapper (object):
             sid = transaction.savepoint()
             model_instance.save()
             transaction.savepoint_commit(sid)
-            return True
+            return model_instance
         except IntegrityError:
             # If it's a duplicate, don't worry about it.  Just move on.
             transaction.savepoint_rollback(sid)
-            return False
+            return None

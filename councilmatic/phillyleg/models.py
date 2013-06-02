@@ -339,6 +339,17 @@ class LegAction(TimestampedModelMixin, models.Model):
             return 'label-inverse'
 
 
+class LegVote(models.Model):
+    action = models.ForeignKey(LegAction, related_name='votes')
+    voter = models.ForeignKey(CouncilMember, related_name='votes')
+    value = models.CharField(max_length=50)
+
+    def __unicode__(self):
+        return "%s voted with %s on %s" % (
+            unicode(self.voter), unicode(self.value), 
+            unicode(self.action.file))
+
+
 class LegMinutes(TimestampedModelMixin, models.Model):
     url = models.URLField(unique=True)
     fulltext = models.TextField()

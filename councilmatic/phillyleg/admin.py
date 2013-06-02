@@ -61,6 +61,7 @@ class CouncilMemberAdmin (admin.ModelAdmin):
 
 admin.site.register(LegFile, LegFileAdmin)
 admin.site.register(LegMinutes, LegMinutesAdmin)
+admin.site.register(LegVote, admin.ModelAdmin)
 admin.site.register(CouncilMember, CouncilMemberAdmin)
 admin.site.register(MetaData_Word, WordAdmin)
 admin.site.register(MetaData_Location, LocationAdmin)

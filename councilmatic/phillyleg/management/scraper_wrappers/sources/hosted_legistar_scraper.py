@@ -7,7 +7,6 @@ import urllib2
 import utils
 import urlparse
 from collections import defaultdict
-import pdb
 
 from legistar.scraper import LegistarScraper
 from legistar.config import Config, DEFAULT_CONFIG
@@ -122,13 +121,20 @@ class HostedLegistarSiteWrapper (object):
                 print summary
                 continue
             try:
+                acting_body = act['Action By']
+                if not isinstance(acting_body, basestring):
+                    acting_body = acting_body['label']
+
                 action = {
                     'key' : key,
                     'date_taken' : self.convert_date(act['Date']),
-                    'acting_body' : act['Action By']['label'],
+                    'acting_body' : acting_body,
                     'motion' : act['Result'],
                     'description' : act['Action'],
-                    'notes' : ''
+                    'notes' : '',
+                    'votes': [{'voter': vote['Person Name'],
+                               'value': vote['Vote']}
+                              for vote in act_votes]
                     }
             except TypeError as e:
                 print e
