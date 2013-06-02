@@ -72,6 +72,9 @@ class CouncilmaticDataStoreWrapper (object):
         sponsor_names = file_record['sponsors']
         del file_record['sponsors']
 
+        # Indexes become tags
+        index_names = file_record.pop('indexes', [])
+
         # Create the record
         try:
             legfile = LegFile.objects.get(key=file_record['key'])
@@ -87,6 +90,7 @@ class CouncilmaticDataStoreWrapper (object):
         legfile.save(update_words=changed, update_mentions=changed, update_locations=changed)
 
         existing_sponsors = legfile.sponsors.all()
+        existing_topics = legfile.metadata.topics.all()
 
         if isinstance(sponsor_names, basestring):
             sponsor_names = sponsor_names.split(',')
@@ -101,10 +105,13 @@ class CouncilmaticDataStoreWrapper (object):
                 sponsor.legislation.add(legfile)
                 sponsor.save()
 
+        for index_name in index_names:
+            topic, created = MetaData_Topic.objects.get_or_create(topic=index_name)
+            if topic not in existing_topics:
+                legfile.metadata.topics.add(topic)
 
         # Create notes attached to the record
         for attachment_record in attachment_records:
-            print attachment_record
             attachment_record = self.__replace_key_with_legfile(attachment_record)
             self._save_or_ignore(LegFileAttachment, attachment_record)
 

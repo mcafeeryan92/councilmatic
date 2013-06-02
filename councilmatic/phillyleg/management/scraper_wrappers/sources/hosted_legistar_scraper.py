@@ -33,6 +33,7 @@ class HostedLegistarSiteWrapper (object):
         self.type_label = options.pop('type_label', 'Type')
         self.status_label = options.pop('status_label', 'Status')
         self.title_label = options.pop('title_label', 'Title')
+        self.indexes_label = options.pop('indexes_label', 'Indexes')
         self.intro_date_label = options.pop('intro_date_label', 'Intro Date')
         self.final_date_label = options.pop('final_date_label', 'Final Date')
         self.controlling_body_label = options.pop('controlling_body_label', 'Current Controlling Legislative Body')
@@ -50,18 +51,18 @@ class HostedLegistarSiteWrapper (object):
                 legislation_attrs, legislation_history = self.scraper.expandLegislationSummary(summary)
                 break
             except urllib2.URLError as e:
-                print e
-                print 'skipping to next leg record'
+                log.warning(e)
+                log.warning('skipping to next leg record')
             except AttributeError as e :
-                print e
-                print 'skipping to next leg record'
+                log.warning(e)
+                log.warning('skipping to next leg record')
             while True :
                 try:
                     summary = self.legislation_summaries.next()
                     break
                 except urllib2.URLError as e:
-                    print e
-                    print 'sleeping for five minutes'
+                    log.warning(e)
+                    log.warning('sleeping for five minutes')
                     time.sleep('360')
 
 
@@ -88,6 +89,7 @@ class HostedLegistarSiteWrapper (object):
                 'type' : summary[self.type_label],
                 'status' : summary[self.status_label],
                 'title' : summary[self.title_label],
+                'indexes': legislation_attrs[self.indexes_label],
                 'controlling_body' : legislation_attrs[self.controlling_body_label],
                 'intro_date' : self.convert_date(summary[self.intro_date_label]),
                 'final_date' : self.convert_date(summary.setdefault(self.final_date_label, '')),
