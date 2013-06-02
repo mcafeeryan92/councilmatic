@@ -21,12 +21,13 @@ dependency_links = [
     'https://github.com/fgregg/legistar-scrape/tarball/master#egg=legistar-scrape-dev',
     'https://github.com/abielr/mechanize/tarball/master#egg=mechanize-dev',
 #    'https://bitbucket.org/ubernostrum/django-registration/get/default.tar.gz#egg=django-registration-dev',
+    'https://github.com/mattdeboard/django-registration.git#egg=django-registration-dev'
 ]
 install_requires = [
 # ====================
 # Server
 # ====================
-'Django<1.5',
+'Django<1.6',
 
 
 
@@ -83,7 +84,7 @@ install_requires = [
 # ====================
 # Registration!
 # ====================
-'django-registration==0.8',
+'django-registration==dev',
 'django-recaptcha==dev',
 
 

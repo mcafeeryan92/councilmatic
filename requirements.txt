@@ -1,7 +1,7 @@
 # ====================
 # Server
 # ====================
-Django==1.4
+Django<1.6
 
 
 
@@ -58,7 +58,7 @@ slimit==0.7.4
 # ====================
 # Registration!
 # ====================
-django-registration==0.8
+git+git://github.com/mwieler/django-registration-1.5.git#egg=django-registration
 git+git://github.com/mjumbewu/django-recaptcha.git#egg=django-recaptcha
 
 
