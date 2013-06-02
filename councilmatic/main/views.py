@@ -27,7 +27,7 @@ class NewLegislationFeed (DjangoFeed):
     max_items = 100
 
     def items(self):
-        return phillyleg.models.LegFile.objects.all()[:self.max_items]
+        return phillyleg.models.LegFile.objects.all().exclude(title='')[:self.max_items]
 
     def item_title(self, legfile):
         return u'{0.type} {0.id}'.format(legfile)
@@ -96,7 +96,7 @@ class AppDashboardView (BaseDashboardMixin,
     template_name = 'councilmatic/dashboard.html'
 
     def get_filtered_legfiles(self):
-        return phillyleg.models.LegFile.objects
+        return phillyleg.models.LegFile.objects.exclude(title='')
 
     def get_recent_locations(self):
         return list(phillyleg.models.MetaData_Location.objects.\
@@ -199,7 +199,7 @@ class SearcherMixin (object):
     def _init_haystack_searchview(self, request):
         # Construct and run a haystack SearchView so that we can use the
         # resulting values.
-        self.search_view = haystack.views.SearchView(form_class=forms.FullSearchForm, searchqueryset=SearchQuerySet())
+        self.search_view = haystack.views.SearchView(form_class=forms.FullSearchForm, searchqueryset=SearchQuerySet().exclude(title=''))
         self.search_view.request = request
 
         self.search_view.form = self.search_view.build_form()
@@ -209,6 +209,7 @@ class SearcherMixin (object):
     def _get_search_results(self, query_params):
         if len(query_params) == 0:
             search_queryset = phillyleg.models.LegFile.objects.all()\
+                .exclude(title='')\
                 .order_by('-key')\
                 .prefetch_related('metadata__locations', 'metadata__topics')
 

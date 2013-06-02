@@ -110,12 +110,6 @@ class CouncilDistrict(TimestampedModelMixin, models.Model):
         return u'District {d}'.format(d=self.id)
 
 
-class LegFileManager (models.Manager):
-    def get_query_set(self):
-        qs = super(LegFileManager, self).get_query_set()
-        return qs.exclude(title='')
-
-
 class LegFile(TimestampedModelMixin, models.Model):
     key = models.IntegerField(primary_key=True)
     id = models.CharField(max_length=100, null=True)
@@ -132,8 +126,6 @@ class LegFile(TimestampedModelMixin, models.Model):
     url = models.URLField()
     version = models.CharField(max_length=100)
     is_routine = models.BooleanField(default=True, blank=True)
-
-    objects = LegFileManager()
 
     class Meta:
         ordering = ['-key']
