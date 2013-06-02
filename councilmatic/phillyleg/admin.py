@@ -29,7 +29,7 @@ class WordAdmin (admin.ModelAdmin):
     model = MetaData_Word
     inlines = [LegFileWordInline]
 
-class LocationAdmin (admin.GeoModelAdmin):
+class LocationAdmin (admin.OSMGeoAdmin):
     model = MetaData_Location
     search_fields = ['address']
 
@@ -37,7 +37,7 @@ class CouncilDistrictInline(admin.TabularInline):
     model = CouncilDistrict
     extra = 0
 
-class CouncilDistrictPlanAdmin (admin.GeoModelAdmin):
+class CouncilDistrictPlanAdmin (admin.OSMGeoAdmin):
     inlines = [CouncilDistrictInline]
 
 class CouncilMemberTenureInline (admin.TabularInline):
@@ -65,5 +65,5 @@ admin.site.register(CouncilMember, CouncilMemberAdmin)
 admin.site.register(MetaData_Word, WordAdmin)
 admin.site.register(MetaData_Location, LocationAdmin)
 admin.site.register(LegFileMetaData)
-admin.site.register(CouncilDistrict, admin.GeoModelAdmin)
+admin.site.register(CouncilDistrict, admin.OSMGeoAdmin)
 admin.site.register(CouncilDistrictPlan, CouncilDistrictPlanAdmin)
