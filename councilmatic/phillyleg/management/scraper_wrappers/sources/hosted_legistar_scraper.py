@@ -15,6 +15,10 @@ from legistar.config import Config, DEFAULT_CONFIG
 log = logging.getLogger(__name__)
 
 
+class ScrapeError (Exception):
+    pass
+
+
 class HostedLegistarSiteWrapper (object):
     """
     A facade over the Philadelphia city council legistar site data.  It is
@@ -25,6 +29,16 @@ class HostedLegistarSiteWrapper (object):
     """
 
     def __init__(self, **options):
+        self.id_label = options.pop('id_label', 'Record #')
+        self.url_label = options.pop('url_label', 'URL')
+        self.type_label = options.pop('type_label', 'Type')
+        self.status_label = options.pop('status_label', 'Status')
+        self.title_label = options.pop('title_label', 'Title')
+        self.intro_date_label = options.pop('intro_date_label', 'Intro Date')
+        self.final_date_label = options.pop('final_date_label', 'Final Date')
+        self.controlling_body_label = options.pop('controlling_body_label', 'Current Controlling Legislative Body')
+        self.version_label = options.pop('version_label', 'Version')
+
         self.scraper = LegistarScraper(options)
         self.legislation_summaries =  self.scraper.searchLegislation('', created_before='2012-10-5')
 
@@ -67,22 +81,27 @@ class HostedLegistarSiteWrapper (object):
                 sponsor = ' '.join(name_list).strip()
             first_name_first_sponsors.append(sponsor)
 
-        record = {
-            'key' : key,
-            'id' : summary['Record #'],
-            'url' : summary['URL'],
-            'type' : summary['Type'],
-            'status' : summary['Status'],
-            'title' : summary['Title'],
-            'controlling_body' : legislation_attrs['Current Controlling Legislative Body'],
-            'intro_date' : self.convert_date(summary['Intro Date']),
-            'final_date' : self.convert_date(summary.setdefault('Final Date', '')),
-            'version' : summary.setdefault('Version', ''),
-            #'contact' : None,
-            'sponsors' : first_name_first_sponsors,
-            # probably remove this from the model as well
-            'minutes_url'  : None
-        }
+        try:
+            record = {
+                'key' : key,
+                'id' : summary[self.id_label],
+                'url' : summary[self.url_label],
+                'type' : summary[self.type_label],
+                'status' : summary[self.status_label],
+                'title' : summary[self.title_label],
+                'controlling_body' : legislation_attrs[self.controlling_body_label],
+                'intro_date' : self.convert_date(summary[self.intro_date_label]),
+                'final_date' : self.convert_date(summary.setdefault(self.final_date_label, '')),
+                'version' : summary.setdefault(self.version_label, ''),
+                #'contact' : None,
+                'sponsors' : first_name_first_sponsors,
+                # probably remove this from the model as well
+                'minutes_url'  : None
+            }
+        except KeyError, e:
+            raise ScrapeError('Failed to find key %s in either summary keys '
+                              '(%r) or attrs (%r)' % (e, summary.keys(), 
+                                                    legislation_attrs.keys()))
 
         try:
             attachments = legislation_attrs['Attachments']
