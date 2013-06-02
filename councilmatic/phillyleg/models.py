@@ -339,12 +339,12 @@ class LegAction(TimestampedModelMixin, models.Model):
         ordering = ['date_taken']
 
     def get_label(self):
-	if self.description in ['Adopted', 'Approved', 'Direct Introduction', 'Passed'] :
-	  return 'label-success'
+        if self.description in ['Adopted', 'Approved', 'Direct Introduction', 'Passed'] :
+            return 'label-success'
         elif self.description in ['Failed to Pass', 'Vetoed'] :
-	  return 'label-important'
-	else :
-	  return 'label-inverse'
+            return 'label-important'
+        else :
+            return 'label-inverse'
 
 
 class LegMinutes(TimestampedModelMixin, models.Model):
@@ -479,10 +479,10 @@ class MetaData_Topic (models.Model):
     topic = models.CharField(max_length=128, unique=True)
 
     def get_label(self):
-	if self.topic == 'Non-Routine' :
-	    return 'label-info'
-	else :
-	    return 'label-inverse'
+        if self.topic == 'Non-Routine' :
+            return 'label-info'
+        else :
+            return 'label-inverse'
     
     def __unicode__(self):
         return self.topic
