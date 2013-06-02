@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% load url from future %}
 {% load model_blocks %}
 {% load uni_form_tags %}
 {% load comments %}
@@ -7,7 +8,7 @@
   <div id="box" class='span10 offset1'>
     <div class="block" id="block-signin">
       <h2>Log In...</h2>
-      <form class="uniForm" method="POST" action="{% url registration_login %}">{% csrf_token %}
+      <form class="uniForm" method="POST" action="{% url 'registration_login' %}">{% csrf_token %}
         <fieldset class="inlineLabels">
         {{ form|as_uni_form }}
         <div class="buttonHolder">
