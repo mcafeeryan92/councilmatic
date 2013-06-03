@@ -1,4 +1,5 @@
 *.pyc
+*.log
 *~
 *.swn
 *.swo
@@ -31,6 +32,10 @@ application_keys.py
 
 # Local settings
 local_settings.py
+
+# Eclipse garbage
+.project
+.pydevproject
 
 /static
 crons/daily_jobs

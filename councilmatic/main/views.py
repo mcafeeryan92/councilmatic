@@ -10,6 +10,7 @@ from datetime import timedelta
 from cm_api.resources import SubscriberResource
 from main import feeds
 from main import forms
+from phillyleg.models import MetaData_Topic, LegFile, CouncilMember
 
 import haystack.views
 import bookmarks.views
@@ -339,6 +340,15 @@ class SearchView (SearcherMixin,
         bookmark_data = self.get_bookmarks_data(self.object_list)
         bookmark_cache_key = self.get_bookmarks_cache_key(bookmark_data)
 
+        context['topics'] = [(topic.topic, topic.topic)
+                             for topic in MetaData_Topic.objects.all().order_by('topic')]
+        
+        context['statuses'] = legfile_choices('status')
+        context['controlling_bodies'] = legfile_choices('controlling_body')
+        context['file_types'] = legfile_choices('type')
+        context['sponsors'] = [(member.name, member.name)
+                               for member in CouncilMember.objects.all().order_by('name')]
+        
         context['bookmark_data'] = bookmark_data
         context['bookmark_cache_key'] = bookmark_cache_key
 
@@ -424,3 +434,10 @@ class BookmarkListView (SearchBarMixin,
             return [bm.content for bm in user.bookmarks.all()]
         else:
             return []
+
+
+def legfile_choices(field):
+    value_objs = LegFile.objects.values(field).distinct().order_by(field)
+    values = [(value_obj[field], value_obj[field])
+          for value_obj in value_objs]
+    return values

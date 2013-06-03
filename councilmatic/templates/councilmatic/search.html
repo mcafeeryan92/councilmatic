@@ -7,69 +7,168 @@
 {% endblock %}
 
 {% block content %}
-  <section id="main" class="legfile_search">
+<section id="main" class="legfile_search">
 
-    <div class="block">
+	<div class="block">
 
-      <div class="row-fluid">
-        <section id="dashboard_legislation" class="span7 offset1">
-          {% if object_list %}
-	    <div class='pull-right'>{% include 'subscriptions/subscribe_form.html' %}</div>
-            <h3>{% trans "Legislation results" %}</h3>
-	    <div class='clearfix'></div>
-	    <hr />
-        {% include "councilmatic/partials/legfile_list.html" %}
+		<div class="row-fluid">
+			<section id="dashboard_legislation" class="span7 offset1">
+				{% if object_list %}
+				<div class='pull-right'>
+					{% include 'subscriptions/subscribe_form.html' %}
+				</div>
+				<h3>{% trans "Legislation results" %}</h3>
+				<div class='clearfix'></div>
+				<hr />
+				{% include "councilmatic/partials/legfile_list.html" %}
 
-            {% if page_obj.has_previous or page_obj.has_next %}
-            <div class="pagination pagination-centered">
-              <ul>
-                <li><a href="{{ first_url }}">&laquo;</a></li>
+				{% if page_obj.has_previous or page_obj.has_next %}
+				<div class="pagination pagination-centered">
+					<ul>
+						<li>
+							<a href="{{ first_url }}">&laquo;</a>
+						</li>
 
-                {% if page_obj.has_previous %}<li><a href="{{ previous_url }}">&lsaquo;</a></li>{% endif %}
+						{% if page_obj.has_previous %}
+						<li>
+							<a href="{{ previous_url }}">&lsaquo;</a>
+						</li>{% endif %}
 
-                <li class="disabled hidden-phone"><a>{% trans "Page" %} ...</a></li>
+						<li class="disabled hidden-phone">
+							<a>{% trans "Page" %} ...</a>
+						</li>
 
-                {% for page_num, page_url in page_urls %}
-                  <li{% if not page_url %} class="active"{% endif %}><a{% if page_url %} href="{{ page_url }}"{% endif %}>{{ page_num }}</a></li>
-                {% endfor %}
+						{% for page_num, page_url in page_urls %}
+						<li{% if not page_url %} class="active"{% endif %}>
+							<a{% if page_url %} href="{{ page_url }}"{% endif %}>
+								{{ page_num }}</a></li>
+								{% endfor %}
 
-                <li class="disabled hidden-phone"><a>... {% blocktrans %}of {{ page_obj.paginator.num_pages }}{{page_obj.paginator}}{% endblocktrans %}</a></li>
+								<li class="disabled hidden-phone">
+									<a>... {% blocktrans %}of {{ page_obj.paginator.num_pages }}{{page_obj.paginator}}{% endblocktrans %}</a>
+								</li>
 
-                {% if page_obj.has_next %}<li><a href="{{ next_url }}">&rsaquo;</a></li>{% endif %}
+								{% if page_obj.has_next %}
+								<li>
+									<a href="{{ next_url }}">&rsaquo;</a>
+								</li>{% endif %}
 
-                <li><a href="{{ last_url }}">&raquo;</a></li>
-              </ul>
-            </div>
-            {% endif %}
-          {% else %}
-            {# Show some example queries to run, maybe query syntax, something else? #}
-          {% endif %}
-        </section>
+								<li>
+									<a href="{{ last_url }}">&raquo;</a>
+								</li>
+					</ul>
+				</div>
+				{% endif %}
+				{% else %}
+				{# Show some example queries to run, maybe query syntax, something else? #}
+				{% endif %}
+			</section>
 
-        <div class="span3">
-	  <div class='well'>
-            <h3>{% trans "Find legislation" %}</h3>
+			<div class="span3">
+				<div class='well'>
+					<h3>{% trans "Find legislation" %}</h3>
 
-            {# It may either be called `search_form` or just `form` #}
+					<form action="{% url 'search' %}" method="GET" class="uniForm" id="id_legislation_search_form">
+						<fieldset class="inlineLabels">
+							<div id="div_id_q" class="ctrlHolder">
 
-            <form action="{% url 'search' %}" method="GET" class="uniForm" id="id_legislation_search_form">
-              <fieldset class="inlineLabels">
-                {% if search_form %}
-                  {{ search_form|as_uni_form }}
-                {% else %}
-                  {{ form|as_uni_form }}
-                {% endif %}
-                <button type="submit" class="btn btn-info">Search</button>
-              </fieldset>
-            </form>
-	  </div>
-        </div>
-      </div>
-    </div>
-  </section>
+								<label for="id_q"> Search </label>
+
+								<input id="id_q" type="text" class="textInput textinput" name="q">
+
+							</div>
+							<div id="div_id_topics" class="ctrlHolder">
+
+								<label for="id_topics"> Narrow by topics &raquo; </label>
+
+								<ul>
+									{% for topic in topics %}
+									<li>
+										<label for="id_topics_{{ forloop.counter0 }}">
+											<input value="{{ topic.0 }}" type="checkbox" class="checkboxselectmultiple" name="topics" id="id_topics_{{ forloop.counter0 }}">
+											{{ topic.1 }}</label>
+									</li>
+									{% endfor %}
+								</ul>
+
+							</div>
+							<div id="div_id_statuses" class="ctrlHolder" style="min-height: 10px;">
+								<div class="field_selection" style="display: block;"></div>
+
+								<label for="id_statuses"> Narrow by status &raquo; </label>
+
+								<ul>
+									{% for status in statuses %}
+									<li>
+										<label for="id_statuses_{{ forloop.counter0 }}">
+											<input value="{{ status.0 }}" type="checkbox" class="checkboxselectmultiple" name="statuses" id="id_statuses_{{ forloop.counter0 }}">
+											{{ status.1 }}</label>
+									</li>
+									{% endfor %}
+								</ul>
+
+							</div>
+							<div id="div_id_controlling_bodies" class="ctrlHolder">
+								<div class="field_selection"></div>
+
+								<label for="id_controlling_bodies"> Narrow by controlling body &raquo; </label>
+
+								<ul>
+									{% for controlling_body in controlling_bodies %}
+									<li>
+										<label for="id_controlling_bodies_{{ forloop.counter0 }}">
+											<input value="{{ controlling_body.0 }}" type="checkbox" class="checkboxselectmultiple" name="controlling_bodies" id="id_controlling_bodies_{{ forloop.counter0 }}">
+											{{ controlling_body.1 }}</label>
+									</li>
+									{% endfor %}
+								</ul>
+							</div>
+							<div id="div_id_file_types" class="ctrlHolder">
+								<div class="field_selection"></div>
+
+								<label for="id_file_types"> Narrow by type of legislation &raquo; </label>
+
+								<ul>
+									{% for file_type in file_types %}
+									<li>
+										<label for="id_file_types_{{ forloop.counter0 }}">
+											<input value="{{ file_type.0 }}" type="checkbox" class="checkboxselectmultiple" name="file_types" id="id_file_types_{{ forloop.counter0 }}">
+											{{ file_type.1 }}</label>
+									</li>
+									{% endfor %}
+								</ul>
+
+							</div>
+							<div id="div_id_sponsors" class="ctrlHolder">
+								<div class="field_selection"></div>
+
+								<label for="id_sponsors"> Narrow by sponsors &raquo; </label>
+
+								<ul>
+									{% for sponsor in sponsors %}
+									<li>
+										<label for="id_sponsors_{{ forloop.counter0 }}">
+											<input value="{{ sponsor.0 }}" type="checkbox" class="checkboxselectmultiple" name="sponsors" id="id_sponsors_{{ forloop.counter0 }}">
+											{{ sponsor.1 }}
+										</label>
+									</li>
+									{% endfor %}
+								</ul>
+
+							</div>
+							<button type="submit" class="btn btn-info">
+								Search
+							</button>
+						</fieldset>
+					</form>
+				</div>
+			</div>
+		</div>
+	</div>
+</section>
 
 {% endblock %}
 
 {% block load_late %}
-  <script src="{{ STATIC_URL }}main/dashboard_search.js"></script>
+<script src="{{ STATIC_URL }}main/dashboard_search.js"></script>
 {% endblock %}
