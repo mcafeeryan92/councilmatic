@@ -351,7 +351,7 @@ class SearchView (SearcherMixin,
 
         context.update(self.get_pages_context_data(page_obj, query_params))
 
-        bookmark_data = self.get_bookmarks_data(self.object_list)
+        bookmark_data = self.get_bookmarks_data(page_obj.object_list)
         bookmark_cache_key = self.get_bookmarks_cache_key(bookmark_data)
 
         context['bookmark_cache_key'] = bookmark_cache_key
