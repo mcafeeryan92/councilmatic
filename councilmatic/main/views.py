@@ -3,6 +3,7 @@ import logging as log
 from django.contrib.syndication.views import Feed as DjangoFeed
 from django.shortcuts import get_object_or_404
 from django.views import generic as views
+from django.core.cache import cache
 from haystack.query import SearchQuerySet
 import datetime
 from datetime import timedelta
@@ -19,6 +20,18 @@ import phillyleg.models
 import subscriptions.forms
 import subscriptions.models
 import subscriptions.views
+
+
+def get_or_cache(cache_key, getter_func):
+    """
+    Retrieve a value from the cache. If no value is cached for the key, cache
+    and return the value returned by running the getter_func with no arguments.
+    """
+    val = cache.get(cache_key)
+    if val is None:
+        val = getter_func()
+        cache.set(cache_key, val)
+    return val
 
 
 class NewLegislationFeed (DjangoFeed):
@@ -340,18 +353,22 @@ class SearchView (SearcherMixin,
         bookmark_data = self.get_bookmarks_data(self.object_list)
         bookmark_cache_key = self.get_bookmarks_cache_key(bookmark_data)
 
-        context['topics'] = [(topic.topic, topic.topic)
-                             for topic in MetaData_Topic.objects.all().order_by('topic')]
-        
-        context['statuses'] = legfile_choices('status')
-        context['controlling_bodies'] = legfile_choices('controlling_body')
-        context['file_types'] = legfile_choices('type')
-        context['sponsors'] = [(member.name, member.name)
-                               for member in CouncilMember.objects.all().order_by('name')]
-        
-        context['bookmark_data'] = bookmark_data
         context['bookmark_cache_key'] = bookmark_cache_key
+        context['bookmark_data'] = bookmark_data
 
+        context['topics'] = get_or_cache('search_topics',
+            lambda: [(topic.topic, topic.topic)
+                     for topic in MetaData_Topic.objects.all().order_by('topic')])
+        context['statuses'] = get_or_cache('search_statuses',
+            lambda: legfile_choices('status'))
+        context['controlling_bodies'] = get_or_cache('search_controlling_bodies',
+            lambda: legfile_choices('controlling_body'))
+        context['file_types'] = get_or_cache('search_file_types',
+            lambda: legfile_choices('type'))
+        context['sponsors'] = get_or_cache('search_sponsors',
+            lambda: [(member.name, member.name)
+                     for member in CouncilMember.objects.all().order_by('name')])
+        
         log.debug(context)
         return context
 
