@@ -20,7 +20,7 @@ dependency_links = [
     'git+git://github.com/fgregg/legistar-scrape@42b35fe#egg=legistar-scrape-0.1',
     'git+git://github.com/abielr/mechanize@813ba36#egg=mechanize-0.2.6',
 #    'https://bitbucket.org/ubernostrum/django-registration/get/default.tar.gz#egg=django-registration-dev',
-    'git+git://github.com/mattdeboard/django-registration@4142543#egg=django-registration-0.9.1b1'
+    'git+git://github.com/mjumbewu/django-registration@a22ba5a#egg=django-registration-0.9.1-b1'
 ]
 install_requires = [
 # ====================
@@ -83,7 +83,7 @@ install_requires = [
 # ====================
 # Registration!
 # ====================
-'django-registration==0.9.1b1',
+'django-registration==0.9.1-b1',
 
 
 
