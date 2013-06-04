@@ -1,5 +1,4 @@
 {% extends "base.html" %}
-{% load model_blocks %}
 
 {% block load_early %}
 	<link rel="stylesheet" href="{{ STATIC_URL }}phillyleg/legislation.css">
@@ -9,10 +8,6 @@
 {% block content %}
   <section id="main">
     <div class="block">
-
-      {% with active='bookmarks' %}
-        {% include 'main/partials/dashboard_menu.html' %}
-      {% endwith %}
 
       <div class="content">
         <div class="inner">

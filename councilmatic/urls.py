@@ -68,6 +68,7 @@ urlpatterns = patterns(
     url(r'^member/(?P<pk>\d+)$', main.views.CouncilMemberDetailView.as_view(),
         name='councilmember_detail'),
 
+    # TODO: These templates are not implemented in the core of Councilmatic.
     url(r'^minutes/$', ListView.as_view(
         model=phillyleg.models.LegMinutes,
         template_name='phillyleg/legminutes_list.html'),

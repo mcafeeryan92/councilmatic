@@ -63,18 +63,10 @@ install_requires = [
 
 
 # ====================
-# Authentication
-# ====================
-'django-social-auth==0.6.7',
-
-
-
-# ====================
 # Template rendering
 # ====================
 'django-uni-form',
 'django-mustachejs==0.6.0',
-'django-model-blocks',
 'django_compressor==1.1.2',
 'slimit==0.7.4',
 

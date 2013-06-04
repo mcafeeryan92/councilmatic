@@ -4,6 +4,7 @@ from django.contrib.syndication.views import Feed as DjangoFeed
 from django.shortcuts import get_object_or_404
 from django.views import generic as views
 from django.core.cache import cache
+from django.core.urlresolvers import reverse_lazy
 from haystack.query import SearchQuerySet
 import datetime
 from datetime import timedelta
@@ -389,20 +390,8 @@ class LegislationStatsMixin (object):
         return queryset
 
 
-class LegislationListView (SearchBarMixin,
-                           subscriptions.views.SingleSubscriptionMixin,
-                           bookmarks.views.MultipleBookmarkedObjectsMixin,
-                           views.ListView):
-    model = phillyleg.models.LegFile
-    template_name = 'phillyleg/legfile_list.html'
-    paginate_by = 10
-
-    def get_content_feed(self):
-        return feeds.NewLegislationFeed()
-
-    def get_queryset(self):
-        queryset = super(LegislationListView, self).get_queryset()
-        return queryset.order_by('-intro_date', '-key')
+class LegislationListView (views.RedirectView):
+    url = reverse_lazy('search')
 
 
 class LegislationDetailView (SearchBarMixin,

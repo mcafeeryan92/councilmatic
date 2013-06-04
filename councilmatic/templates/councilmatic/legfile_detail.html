@@ -1,8 +1,5 @@
 {% extends "base.html" %}
-{% load model_blocks %}
-{% load uni_form_tags %}
 {% load url from future %}
-{% load comments %}
 {% load compress %}
 
 {% block title %}{{ object.title|truncatewords:14 }}{% endblock %}
@@ -146,13 +143,13 @@
         <h4>What's your opinion?</h4>
           {% if user.is_authenticated %}
             {% if is_opined %}
-            <form action="{% url 'revise_opinion' opinion.pk %}" method="post" class="uniForm">{% csrf_token %}
+            <form action="{% url 'revise_opinion' opinion.pk %}" method="post">{% csrf_token %}
             {% else %}
-            <form action="{% url 'express_opinion' %}" method="post" class="uniForm">{% csrf_token %}
+            <form action="{% url 'express_opinion' %}" method="post">{% csrf_token %}
             {% endif %}
               <fieldset class="inlineLabels">
                 <input type="hidden" name="next" value="{{ request.get_full_path }}">
-                {{ opinion_form|as_uni_form }}
+                {{ opinion_form }}
                   <button class='btn btn-info' type="submit" class="primaryAction">Post your statement</button>
               </fieldset>
             </form>

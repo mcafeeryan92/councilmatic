@@ -74,6 +74,7 @@ class SingleBookmarkedObjectMixin (BaseBookmarkMixin):
 class MultipleBookmarkedObjectsMixin (BaseBookmarkMixin):
     def get_context_data(self, **kwargs):
         context = super(MultipleBookmarkedObjectsMixin, self).get_context_data(**kwargs)
+        user = self.request.user
 
         # Use the object_list from the context; it's already paginated, so it's
         # potentially a small subset of what's available.  Getting bookmark
@@ -85,7 +86,7 @@ class MultipleBookmarkedObjectsMixin (BaseBookmarkMixin):
                 content.pk,
                 bookmark.pk if bookmark else '',
                 contenttype.pk,
-                self.request.user.pk if user.is_authenticated() else ''
+                user.pk if user.is_authenticated() else ''
             ) for content, bookmark, contenttype, form in context['bookmark_data']])
 
 

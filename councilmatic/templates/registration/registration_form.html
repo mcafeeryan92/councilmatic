@@ -1,7 +1,4 @@
 {% extends "base.html" %}
-{% load model_blocks %}
-{% load uni_form_tags %}
-{% load comments %}
 {% load url from future %}
 
 {% block load_early %}
@@ -15,7 +12,7 @@
       <p>Register in order to subscribe to legislation feeds or to weigh in on legslation.</p>
       <form class="uniForm" method="POST" action="{% url 'registration_register' %}">{% csrf_token %}
         <fieldset class="inlineLabels">
-        {{ form|as_uni_form }}
+        {{ form }}
         <div class="buttonHolder">
           <button type="submit" class="primaryAction btn">Sign up</button>
           {% if request.GET.next %}
