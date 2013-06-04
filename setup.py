@@ -15,19 +15,18 @@ author = 'Mjumbe Wawatu Ukweli'
 author_email = 'mjumbewu@gmail.com'
 license = 'BSD'
 dependency_links = [
-    'https://github.com/mjumbewu/pysolr/tarball/master#egg=pysolr-3.0.5-dev',
-    'https://github.com/toastdriven/django-haystack/tarball/master#egg=django-haystack-2.0.0-beta',
-    'https://github.com/mjumbewu/django-recaptcha/tarball/master#egg=django-recaptcha-dev',
-    'https://github.com/fgregg/legistar-scrape/tarball/master#egg=legistar-scrape-dev',
-    'https://github.com/abielr/mechanize/tarball/master#egg=mechanize-dev',
+    'git+git://github.com/mjumbewu/pysolr.git@056f4e2d#egg=pysolr-3.0.6',
+    'git+git://github.com/toastdriven/django-haystack.git@b9c9e47#egg=django-haystack-2.0.0',
+    'git+git://github.com/fgregg/legistar-scrape@42b35fe#egg=legistar-scrape-0.1',
+    'git+git://github.com/abielr/mechanize@813ba36#egg=mechanize-0.2.6',
 #    'https://bitbucket.org/ubernostrum/django-registration/get/default.tar.gz#egg=django-registration-dev',
-    'https://github.com/mattdeboard/django-registration/tarball/master#egg=django-registration-dev'
+    'git+git://github.com/mattdeboard/django-registration@4142543#egg=django-registration-0.9.1b1'
 ]
 install_requires = [
 # ====================
 # Server
 # ====================
-'Django<1.6',
+'Django>=1.5',
 
 
 
@@ -50,7 +49,7 @@ install_requires = [
 # ====================
 # Search
 # ====================
-'django-haystack==2.0.0-beta',
+'django-haystack==2.0.0',
 
 # Using whoosh as the haystack (search) backend for now, for simplicity (it's
 # pure Python).  May use pysolr later, but may not need to.
@@ -59,7 +58,7 @@ install_requires = [
 # Using my version of pysolr until issue # is pulled, as DOTCLOUD's trailing
 # slash on SOLR url breaks pysolr.
 #pysolr==3.0.4
-'pysolr==3.0.5-dev',
+'pysolr==3.0.6',
 
 
 
@@ -84,8 +83,7 @@ install_requires = [
 # ====================
 # Registration!
 # ====================
-'django-registration==dev',
-'django-recaptcha==dev',
+'django-registration==0.9.1b1',
 
 
 
@@ -97,12 +95,12 @@ install_requires = [
 'requests==0.11.1',
 
 # Scraping
-'legistar-scrape==dev',
+'legistar-scrape==0.1',
 'BeautifulSoup',
 'BeautifulSoup4',
 'pdfminer',
 'slate',
-'mechanize==dev',
+'mechanize==0.2.6',
 
 
 # ====================
