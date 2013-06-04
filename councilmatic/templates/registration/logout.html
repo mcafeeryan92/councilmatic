@@ -2,6 +2,7 @@
 {% load model_blocks %}
 {% load uni_form_tags %}
 {% load comments %}
+{% load url from future %}
 
 {% block load_early %}
 <!--  <link rel="stylesheet" href="{{ STATIC_URL }}phillyleg/legislation.css">-->
@@ -17,7 +18,7 @@
             <p>You have been logged out</p>
           </div>
         </div>
-        <p>Thanks for using Councilmatic. <a href="{% url registration_login %}">Log in</a>.</p>
+        <p>Thanks for using Councilmatic. <a href="{% url 'registration_login' %}">Log in</a>.</p>
       </div>
     </div>
   </div>
