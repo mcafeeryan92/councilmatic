@@ -100,7 +100,7 @@ install_requires = [
 'BeautifulSoup4',
 'pdfminer',
 'slate',
-'mechanize==0.2.6',
+'mechanize',
 
 
 # ====================
