@@ -72,8 +72,8 @@ class CouncilmaticDataStoreWrapper (object):
         sponsor_names = file_record['sponsors']
         del file_record['sponsors']
 
-        # Indexes become tags
-        index_names = file_record.pop('indexes', [])
+        # Topics become tags
+        topic_names = file_record.pop('topics', [])
 
         # Create the record
         try:
@@ -105,8 +105,8 @@ class CouncilmaticDataStoreWrapper (object):
                 sponsor.legislation.add(legfile)
                 sponsor.save()
 
-        for index_name in index_names:
-            topic, created = MetaData_Topic.objects.get_or_create(topic=index_name)
+        for topic_name in topic_names:
+            topic, created = MetaData_Topic.objects.get_or_create(topic=topic_name)
             if topic not in existing_topics:
                 legfile.metadata.topics.add(topic)
 

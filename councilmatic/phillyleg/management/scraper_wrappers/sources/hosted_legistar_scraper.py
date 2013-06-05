@@ -33,7 +33,7 @@ class HostedLegistarSiteWrapper (object):
         self.type_label = options.pop('type_label', 'Type')
         self.status_label = options.pop('status_label', 'Status')
         self.title_label = options.pop('title_label', 'Title')
-        self.indexes_label = options.pop('indexes_label', 'Indexes')
+        self.topics_label = options.pop('topics_label', 'Topic')
         self.intro_date_label = options.pop('intro_date_label', 'Intro Date')
         self.final_date_label = options.pop('final_date_label', 'Final Date')
         self.controlling_body_label = options.pop('controlling_body_label', 'Current Controlling Legislative Body')
@@ -81,6 +81,11 @@ class HostedLegistarSiteWrapper (object):
                 sponsor = ' '.join(name_list).strip()
             first_name_first_sponsors.append(sponsor)
 
+        topics = legislation_attrs.get('Topics', None)
+        if topics is None:
+            joined_topics = legislation_attrs.get(self.topics_label, '')
+            topics = [topic.strip() for topic in joined_topics.split(',')]
+
         try:
             record = {
                 'key' : key,
@@ -89,7 +94,7 @@ class HostedLegistarSiteWrapper (object):
                 'type' : summary[self.type_label],
                 'status' : summary[self.status_label],
                 'title' : summary[self.title_label],
-                'indexes': legislation_attrs[self.indexes_label],
+                'topics': topics,
                 'controlling_body' : legislation_attrs[self.controlling_body_label],
                 'intro_date' : self.convert_date(summary[self.intro_date_label]),
                 'final_date' : self.convert_date(summary.setdefault(self.final_date_label, '')),
