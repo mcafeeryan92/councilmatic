@@ -35,14 +35,14 @@
 
         {% include "councilmatic/partials/legfile_list.html" %}
 
-        <a href="/search?q=&topics=Non-Routine">More...</a>
+        <a href="{% url 'search' %}">More...</a>
       </div> <!-- #dashboard-legislation-list -->
 
       <div id="dashboard-legislation-map" class="span5">
         <h3>Topics from the last month</h3>
         {% cache 1800 recent_topics %}
         {% for topic in recent_topics %}
-          <h4>{{topic.leg_count}} <a href='/search?q=&topics={{topic.topic}}'>{{topic.topic}}</a></h4>
+          <h4>{{topic.leg_count}} <a href='{% url 'search' %}?q=topics={{topic.topic}}'>{{topic.topic}}</a></h4>
         {% endfor %}
         {% endcache %}
       </div>
