@@ -2,9 +2,10 @@ import datetime
 import logging
 from django.db import models
 
-import django.contrib.auth.models as auth
+from django.contrib.auth.models import User
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.contenttypes import generic
+from django.db import transaction, DatabaseError, IntegrityError
 from django.utils.translation import ugettext as _
 import haystack.query as haystack
 
@@ -71,13 +72,35 @@ class ContentFeedParameter (models.Model):
 
 # Subscriber
 
-class Subscriber (auth.User):
+class SubscriberManager (models.Manager):
+    def get_or_create_for_user(self, user):
+        try:
+            sid = transaction.savepoint()
+            if not hasattr(user, 'subscriber') or user.subscriber is None:
+                user.subscriber = Subscriber()
+                user.subscriber.save()
+                logging.debug('created subscriber')
+            transaction.savepoint_commit(sid)
+            return user.subscriber
+        except (DatabaseError, IntegrityError) as e:
+            msg = _('Failed to create a subscriber for the user %r. '
+                    'Received the following database error: %r. Use '
+                    'the syncsubscribers command to create subscribers '
+                    'for those users that don\'t have one.') % (user, e)
+            logging.warning(msg)
+            transaction.savepoint_rollback(sid)
+            return None
 
-#    user = models.OneToOneField('auth.User', parent_link=True)
-    """The auth.User object that this object extends"""
+
+class Subscriber (User):
+
+#    user = models.OneToOneField('User', parent_link=True)
+    """The User object that this object extends"""
 
     # subscriptions (backref)
     """The set of subscriptions for this user"""
+
+    objects = SubscriberManager()
 
     def subscribe(self, feed, library=None, commit=True):
         """Subscribe the user to a content feed."""
@@ -124,8 +147,7 @@ class Subscriber (auth.User):
 
 from django.dispatch import receiver
 from django.db.models.signals import post_save
-from django.db import transaction, DatabaseError, IntegrityError
-@receiver(post_save, sender=auth.User)
+@receiver(post_save, sender=User)
 def create_subscriber_for_user(sender, **kwargs):
     """
     Create a Subscriber object whenever a user is created.  This is useful so
@@ -139,18 +161,7 @@ def create_subscriber_for_user(sender, **kwargs):
     logging.debug('user is %r' % user)
 
     if created and not raw:
-        try:
-            sid = transaction.savepoint()
-            if not hasattr(user, 'subscriber') or user.subscriber is None:
-                user.subscriber = Subscriber()
-                user.subscriber.save()
-                logging.debug('created subscriber')
-            transaction.savepoint_commit(sid)
-        except (DatabaseError, IntegrityError) as e:
-            msg = _('Failed to create a subscriber for the user %r. '
-                    'Received the following database error: %r.') % (user, e)
-            logging.warning(msg)
-            transaction.savepoint_rollback(sid)
+        Subscriber.objects.get_or_create_for_user(user)
 
 
 class Subscription (models.Model):
