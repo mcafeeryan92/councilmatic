@@ -5,6 +5,7 @@ from django.db import models
 import django.contrib.auth.models as auth
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.contenttypes import generic
+from django.utils.translation import ugettext as _
 import haystack.query as haystack
 
 from subscriptions.fields import SerializedObjectField
@@ -123,6 +124,7 @@ class Subscriber (auth.User):
 
 from django.dispatch import receiver
 from django.db.models.signals import post_save
+from django.db import transaction, DatabaseError, IntegrityError
 @receiver(post_save, sender=auth.User)
 def create_subscriber_for_user(sender, **kwargs):
     """
@@ -137,10 +139,18 @@ def create_subscriber_for_user(sender, **kwargs):
     logging.debug('user is %r' % user)
 
     if created and not raw:
-        if not hasattr(user, 'subscriber') or user.subscriber is None:
-            user.subscriber = Subscriber()
-            user.subscriber.save()
-            logging.debug('created subscriber')
+        try:
+            sid = transaction.savepoint()
+            if not hasattr(user, 'subscriber') or user.subscriber is None:
+                user.subscriber = Subscriber()
+                user.subscriber.save()
+                logging.debug('created subscriber')
+            transaction.savepoint_commit(sid)
+        except (DatabaseError, IntegrityError) as e:
+            msg = _('Failed to create a subscriber for the user %r. '
+                    'Received the following database error: %r.') % (user, e)
+            logging.warning(msg)
+            transaction.savepoint_rollback(sid)
 
 
 class Subscription (models.Model):
