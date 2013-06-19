@@ -11,6 +11,7 @@
     {% endif %}
 </span>
 
+{% cache 1800 'search_summary' file.pk %}
 {% if file.key %}
 <strong><a href="{% url 'legislation_detail' file.key %}">{{ file.type }} {{ file.id }}</a></strong>
 {% endif %}
@@ -19,12 +20,11 @@
   <span class='label {{file.get_status_label}}'>{{ file.status }}</span> on {{ file.intro_date }} 
 </p>
 
-  {% cache 1800 file file.metadata.topics.all %}
-  {% for topic in file.metadata.topics.all %}
-    <a href="/search/?q=&topics={{ topic.topic }}"><span class="label {{ topic.get_label }}">{{ topic.topic }}</span></a>
-  {% endfor %}
-  {% endcache %}
+{% for topic in file.metadata.topics.all %}
+  <a href="/search/?q=&topics={{ topic.topic }}"><span class="label {{ topic.get_label }}">{{ topic.topic }}</span></a>
+{% endfor %}
 
 <p>{{ file.title|truncatewords:25 }}</p>
+{% endcache %}
 
 {% if not forloop.last %}<hr>{% endif %}
