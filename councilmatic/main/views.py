@@ -84,7 +84,7 @@ class BaseDashboardMixin (SearchBarMixin,
                           bookmarks.views.BaseBookmarkMixin):
 
     def get_recent_legislation(self):
-        legfiles = self.get_filtered_legfiles().prefetch_related('metadata__topics')
+        legfiles = self.get_recent_legislation().prefetch_related('metadata__topics')
         return list(legfiles.exclude(metadata__topics__topic='Routine').order_by('-key')[:6])
 
     def get_context_data(self, **kwargs):
@@ -110,7 +110,7 @@ class AppDashboardView (BaseDashboardMixin,
                         views.TemplateView):
     template_name = 'councilmatic/dashboard.html'
 
-    def get_filtered_legfiles(self):
+    def get_recent_legislation(self):
         return phillyleg.models.LegFile.objects.exclude(title='')
 
     def get_recent_locations(self):
@@ -184,7 +184,7 @@ class CouncilMemberDetailView (BaseDashboardMixin,
     def get_content_feed(self):
         return feeds.SearchResultsFeed(search_filter={'sponsors': [self.object.name]})
 
-    def get_filtered_legfiles(self):
+    def get_recent_legislation(self):
         return self.object.legislation
 
     def get_district(self):
