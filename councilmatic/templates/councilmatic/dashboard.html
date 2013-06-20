@@ -5,8 +5,7 @@
 {% load url from future %}
 
 {% block load_early %}
-<!--  <link rel="stylesheet" href="{{ STATIC_URL }}phillyleg/legislation.css">-->
-<!--  <link rel="stylesheet" href="{{ STATIC_URL }}main/app_dashboard.css">-->
+<!-- Put things like extra CSS here. -->
 {% endblock %}
 
 {% block content %}
@@ -53,7 +52,4 @@
 {% endblock %}
 
 {% block load_late %}
-  {# {% compress js %} #}
-  <script src="{{ STATIC_URL }}main/dashboard_search.js"></script>
-  {# {% endcompress %} #}
 {% endblock %}

@@ -7,14 +7,13 @@ admin.autodiscover()
 
 from django.views.generic import ListView, DetailView, TemplateView
 import phillyleg.models
-import phillyleg.resources
 
-import cm_api.views
-import main.views
 import subscriptions.views
 import bookmarks.views
 import haystack.views
 import opinions.views
+
+from . import views
 
 urlpatterns = patterns(
     '',
@@ -46,24 +45,24 @@ urlpatterns = patterns(
     url(r'revise_opinion/(?P<pk>\d+)/$', opinions.views.ReviseOpinionView.as_view(), name='revise_opinion'),
 
     url(r'^$',
-        main.views.AppDashboardView.as_view(),
+        views.AppDashboardView.as_view(),
         name='main_dashboard'),
 
     url(r'^legislation/$',
-        main.views.LegislationListView.as_view(),
+        views.LegislationListView.as_view(),
         name='legislation_list'),
     url(r'^legislation/(?P<pk>\d+)$',
-        main.views.LegislationDetailView.as_view(),
+        views.LegislationDetailView.as_view(),
         name='legislation_detail'),
 
     url(r'^legislation.rss$',
-        main.views.NewLegislationFeed(),
+        views.NewLegislationFeed(),
         name='legislation_feed'),
 
     url(r'^members/$',
-        main.views.CouncilMembersView.as_view(),
+        views.CouncilMembersView.as_view(),
         name='councilmembers'),
-    url(r'^member/(?P<pk>\d+)$', main.views.CouncilMemberDetailView.as_view(),
+    url(r'^member/(?P<pk>\d+)$', views.CouncilMemberDetailView.as_view(),
         name='councilmember_detail'),
 
     # TODO: These templates are not implemented in the core of Councilmatic.
@@ -76,29 +75,15 @@ urlpatterns = patterns(
         template_name='phillyleg/legminutes_detail.html'),
         name='minutes_detail'),
 
-    url(r'^bookmarks/$',
-        main.views.BookmarkListView.as_view(),
-        name='bookmark_list'),
-
-    url(r'^search/$', main.views.SearchView.as_view(),
+    url(r'^search/$', views.SearchView.as_view(),
         name='search'),
 
     url(r'^(?P<user_pk>\d+)/subscriptions/$', TemplateView.as_view(template_name='base.html'), name='user_subscriptions'),
     url(r'^(?P<user_pk>\d+)/subscriptions/(?P<bookmark_pk>\d+)/$', TemplateView.as_view(template_name='base.html'), name='user_subscription'),
 
-    url(r'^', include('cm.urls')),
-
     # RSS
-    url(r'^rss/$', main.views.LegFileListFeedView(),
+    url(r'^rss/$', views.LegFileListFeedView(),
         name='rss_feed'),
-
-    # API v1
-    url(r'^api/v1/councilmembers/$',
-        phillyleg.resources.CouncilMemberListView.as_view(),
-        name='api_councilmember_list'),
-    url(r'^api/v1/councilmembers/(?P<pk>.+)$',
-        phillyleg.resources.CouncilMemberInstanceView.as_view(),
-        name='api_concilmember_instance'),
 
     # API v2
     #
@@ -106,51 +91,49 @@ urlpatterns = patterns(
     # optional comma-separated list of integers -- ((?:\d+,)+\d+)? -- will be
     # treated as a list of primary keys.
     #
-    url(r'^api/',
-        include('djangorestframework.urls', namespace='djangorestframework')),
 
-    url(r'^api/$',
-        cm_api.views.ApiIndexView.as_view(),
-        name='api_index'),
+    # url(r'^api/$',
+    #     api.ApiIndexView.as_view(),
+    #     name='api_index'),
 
-    url(r'^api/v2/subscribers/(?P<pk>\d+)$',
-        cm_api.views.SubscriberView.as_view(),
-        name='api_subscriber_instance'),
+    # url(r'^api/v2/subscribers/(?P<pk>\d+)$',
+    #     api.SubscriberView.as_view(),
+    #     name='api_subscriber_instance'),
 
-    url(r'^api/v2/subscribers/(?P<subscriber>\d+)/subscriptions$',
-        cm_api.views.SubscriptionListView.as_view(),
-        name='api_subscription_list'),
-    url(r'^api/v2/subscribers/(?P<subscriber>\d+)/subscriptions/(?P<pk>\d+)$',
-        cm_api.views.SubscriptionView.as_view(),
-        name='api_subscription_instance'),
+    # url(r'^api/v2/subscribers/(?P<subscriber>\d+)/subscriptions$',
+    #     api.SubscriptionListView.as_view(),
+    #     name='api_subscription_list'),
+    # url(r'^api/v2/subscribers/(?P<subscriber>\d+)/subscriptions/(?P<pk>\d+)$',
+    #     api.SubscriptionView.as_view(),
+    #     name='api_subscription_instance'),
 
-    url(r'^api/v2/councilmembers/(?P<pk_list>(?:\d+,)+\d+)?$',
-        cm_api.views.CouncilMemberListView.as_view(),
-        name='api_councilmember_list'),
-    url(r'^api/v2/councilmembers/(?P<pk>\d+)$',
-        cm_api.views.CouncilMemberInstanceView.as_view(),
-        name='api_councilmember_instance'),
+    # url(r'^api/v2/councilmembers/(?P<pk_list>(?:\d+,)+\d+)?$',
+    #     api.CouncilMemberListView.as_view(),
+    #     name='api_councilmember_list'),
+    # url(r'^api/v2/councilmembers/(?P<pk>\d+)$',
+    #     api.CouncilMemberInstanceView.as_view(),
+    #     name='api_councilmember_instance'),
 
-    url(r'^api/v2/districts/(?P<pk_list>(?:\d+,)+\d+)?$',
-        cm_api.views.CouncilDistrictListView.as_view(),
-        name='api_district_list'),
-    url(r'^api/v2/districts/(?P<pk>\d+)$',
-        cm_api.views.CouncilDistrictInstanceView.as_view(),
-        name='api_district_instance'),
+    # url(r'^api/v2/districts/(?P<pk_list>(?:\d+,)+\d+)?$',
+    #     api.CouncilDistrictListView.as_view(),
+    #     name='api_district_list'),
+    # url(r'^api/v2/districts/(?P<pk>\d+)$',
+    #     api.CouncilDistrictInstanceView.as_view(),
+    #     name='api_district_instance'),
 
-    url(r'^api/v2/district_plans/(?P<pk_list>(?:\d+,)+\d+)?$',
-        cm_api.views.CouncilDistrictPlanListView.as_view(),
-        name='api_district_plan_list'),
-    url(r'^api/v2/district_plans/(?P<pk>\d+)$',
-        cm_api.views.CouncilDistrictPlanInstanceView.as_view(),
-        name='api_district_plan_instance'),
+    # url(r'^api/v2/district_plans/(?P<pk_list>(?:\d+,)+\d+)?$',
+    #     api.CouncilDistrictPlanListView.as_view(),
+    #     name='api_district_plan_list'),
+    # url(r'^api/v2/district_plans/(?P<pk>\d+)$',
+    #     api.CouncilDistrictPlanInstanceView.as_view(),
+    #     name='api_district_plan_instance'),
 
-    url(r'^api/v2/files/(?P<pk_list>(?:\d+,)+\d+)?$',
-        cm_api.views.LegFileListView.as_view(),
-        name='api_legfile_list'),
-    url(r'^api/v2/files/(?P<pk>\d+)$',
-        cm_api.views.LegFileInstanceView.as_view(),
-        name='api_legfile_instance'),
+    # url(r'^api/v2/files/(?P<pk_list>(?:\d+,)+\d+)?$',
+    #     api.LegFileListView.as_view(),
+    #     name='api_legfile_list'),
+    # url(r'^api/v2/files/(?P<pk>\d+)$',
+    #     api.LegFileInstanceView.as_view(),
+    #     name='api_legfile_instance'),
 
     # Flat pages
     url(r'about/',

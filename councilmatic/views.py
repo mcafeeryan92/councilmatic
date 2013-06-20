@@ -9,9 +9,8 @@ from haystack.query import SearchQuerySet, RelatedSearchQuerySet
 import datetime
 from datetime import timedelta
 
-from cm_api.resources import SubscriberResource
-from main import feeds
-from main import forms
+from . import feeds
+from . import forms
 from phillyleg.models import MetaData_Topic, LegFile, CouncilMember
 
 import haystack.views
@@ -417,18 +416,6 @@ class LegislationDetailView (SearchBarMixin,
 #        self.on_object_gotten(legfile)
 
 #        return legfile
-
-
-class BookmarkListView (SearchBarMixin,
-                        views.ListView):
-    template_name = 'main/bookmark_list.html'
-
-    def get_queryset(self):
-        user = self.request.user
-        if user.is_authenticated():
-            return [bm.content for bm in user.bookmarks.all()]
-        else:
-            return []
 
 
 def legfile_choices(field):
