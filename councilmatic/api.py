@@ -16,7 +16,7 @@ or contact admin@councilmatic.org.
 
 class CouncilmaticAPIViewSet (ReadOnlyModelViewSet):
     paginate_by = 20
-    
+
     def get_serializer_class(self):
         class TempSerializer (HyperlinkedModelSerializer):
             class Meta:
@@ -56,6 +56,7 @@ class LegislationViewSet (CouncilmaticAPIViewSet):
         class ActionSerializer (ModelSerializer):
             class Meta:
                 model = LegAction
+                fields = ('id', 'date_taken', 'description', 'motion', 'acting_body', 'notes')
 
         class LegislationSerializer (HyperlinkedModelSerializer):
             actions = ActionSerializer()
