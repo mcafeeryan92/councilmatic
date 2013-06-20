@@ -4,6 +4,7 @@ from datetime import date, time, datetime
 from collections import defaultdict
 from itertools import chain
 from itertools import product
+from urllib import urlencode
 
 from subscriptions.feeds import ContentFeed
 from subscriptions.feeds import ContentFeedLibrary
@@ -156,6 +157,10 @@ class SearchResultsFeed (ContentFeed):
             self.filter = json.loads(search_filter)
         else:
             self.filter = {}
+
+    @property
+    def filter_query(self):
+        return urlencode(self.filter)
 
     def get_content(self):
         qs = SearchQuerySet()
