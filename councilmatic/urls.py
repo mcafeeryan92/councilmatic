@@ -1,4 +1,4 @@
-from django.conf.urls.defaults import *
+from django.conf.urls.defaults import patterns, include, url
 from django.contrib.staticfiles.urls import staticfiles_urlpatterns
 
 # Uncomment the next two lines to enable the admin:
@@ -14,6 +14,7 @@ import haystack.views
 import opinions.views
 
 from . import views
+from . import api
 
 urlpatterns = patterns(
     '',
@@ -92,9 +93,7 @@ urlpatterns = patterns(
     # treated as a list of primary keys.
     #
 
-    # url(r'^api/$',
-    #     api.ApiIndexView.as_view(),
-    #     name='api_index'),
+    url(r'^api/', include(api.router.urls)),
 
     # url(r'^api/v2/subscribers/(?P<pk>\d+)$',
     #     api.SubscriberView.as_view(),
