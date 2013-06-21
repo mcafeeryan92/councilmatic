@@ -41,7 +41,7 @@ install_requires = [
 # ====================
 # API
 # ====================
-'djangorestframework==0.4.0',
+'djangorestframework==2.3.5',
 'markdown',
 
 
