@@ -1,6 +1,7 @@
 {% load uni_form_tags %}
+{% load url from future %}
 
-<form action="{% url subscribe %}" action="POST" class="uniForm">
+<form action="{% url 'subscribe' %}" action="POST" class="uniForm">
     {{ form|as_uni_form }}
     <button type="submit">Submit</button>
 </form>
