@@ -110,6 +110,9 @@ class CouncilmaticDataStoreWrapper (object):
         # Only consider unique councilmember names. This protects against 
         # errors in the source data such as at http://phila.legistar.com/LegislationDetail.aspx?ID=1448369&GUID=854AA05E-BE3F-4ED4-A7D4-D7CFF00987FE
         for sponsor_name in unique(sponsor_names):
+            if sponsor_name is None or len(sponsor_name) == 0:
+                continue
+
             sponsor, created = CouncilMember.objects.get_or_create(name=sponsor_name)
 
             # Add the legislation to the sponsor and save, instead of the other
