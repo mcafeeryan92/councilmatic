@@ -1,27 +1,26 @@
 Councilmatic! [![Build Status](https://travis-ci.org/codeforamerica/councilmatic.png)](http://travis-ci.org/codeforamerica/councilmatic)
 =============
-Philly City Council Legislative Subscription Service.
+City Council Legislative Subscription Service.
 
 Contact Us
 ----------
 - Join the mailing list at https://groups.google.com/group/councilmatic/
 - Find us on irc.freenode.net in the #councilmatic room
 
+Getting Started
+---------------
+**IMPORTANT:** If you are interested in setting up *Councilmatic* for your city, you'll want to start with a [sample local instance](https://github.com/mjumbewu/sample-local-councilmatic/). In most cases, this is the right place to start. If instead you are interested in making modification to the core of *Councilmatic*, proceed with these instructions.
+
 Installation
 ------------
 First check out the project code.
 
-    $ git clone git://github.com/codeforamerica/councilmatic.git
+    git clone git://github.com/codeforamerica/councilmatic.git
 
-To work on your own instance of Councilmatic, you should first get Python
-installed. Follow the instructions for doing so on your platform.
+We recommend setting up a virtual environment for working with any project, so that you can manage your project-specific dependencies. This is optional but recommended:
 
-In addition, we recommend setting up a virtual environment for working with any
-project, so that you can manage your project-specific dependencies.
-
-    $ cd councilmatic
-    $ virtualenv .env --no-site-packages
-    $ source .env/bin/activate
+    virtualenv env --no-site-packages
+    source env/bin/activate
     
 Next, install the requirements for Councilmatic (we recommend working in a
 virtual environment, but it's not strictly necessary).
@@ -65,12 +64,12 @@ syncdb command prompts you to create an administrative user, go ahead and do
 so). There is a lot of data to be loaded, so downloading it all may take a
 while.
 
-    $ cd councilmatic
-    $ python manage.py syncdb # Create admin account when prompted.
-    $ python manage.py migrate
-    $ python manage.py loadlegfiles
-    $ python manage.py rebuild_index # For searches. Say yes when prompted.
-    $ python manage.py collectstatic # For jss and css. Say yes when prompted.
+    cd local-councilmatic-sample
+    python manage.py syncdb # Create admin account when prompted.
+    python manage.py migrate
+    python manage.py updatelegfiles
+    python manage.py rebuild_index # For searches. Say yes when prompted.
+    python manage.py collectstatic # For js and css. Say yes when prompted.
 
 
 ### Development server
@@ -82,6 +81,11 @@ Finally, to run the server:
 Now, check that everything is working by browsing to http://localhost:8000/. Now
 browse to http://localhost:8000/admin and enter the admin username and password
 you supplied and you should have access to all of the legislative files!
+
+
+Architecture
+------------
+The core of Councilmatic is implemented as a Django app. It cannot be run without a Django project. The local-councilmatic-sample folder contains a minimal Django project.
 
 
 Copyright
